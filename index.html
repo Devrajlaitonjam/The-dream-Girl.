@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Dream Girl — A Dream Journal</title>
+  <!-- Date corrected to 16th May 2026 -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=EB+Garamond:ital,wght@0,400;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --ink: #1a1208;
+      --parchment: #f5ede0;
+      --gold: #c8a96e;
+      --gold-light: #e8d5a3;
+      --rose: #b07070;
+      --mist: #8a9ab0;
+      --night: #0d0a18;
+      --star: #f0e6c8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--night);
+      color: var(--star);
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.9;
+      overflow-x: hidden;
+    }
+
+    /* ── STARFIELD ── */
+    #stars-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── COVER ── */
+    .cover {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 2rem;
+      background: radial-gradient(ellipse at 50% 60%, rgba(25,15,50,0.85) 0%, rgba(8,5,20,0.97) 80%);
+    }
+
+    .cover-ornament {
+      font-size: 2rem;
+      color: var(--gold);
+      letter-spacing: 0.4em;
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 0.3s;
+    }
+
+    .cover-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.8rem, 8vw, 6rem);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: var(--gold-light);
+      margin: 1rem 0 0.4rem;
+      text-shadow: 0 0 60px rgba(200,169,110,0.4);
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 0.6s;
+    }
+
+    .cover-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 0.9s;
+    }
+
+    .cover-date {
+      margin-top: 2.5rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--mist);
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 1.2s;
+    }
+
+    .cover-divider {
+      width: 180px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      margin: 2rem auto;
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 1.5s;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--mist);
+      opacity: 0;
+      animation: fadeUp 1s ease forwards 2s, pulse 3s ease-in-out infinite 3s;
+    }
+
+    /* ── PAGES ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 5rem 2.5rem;
+    }
+
+    .page-bg {
+      background: linear-gradient(180deg, rgba(10,6,22,0) 0%, rgba(12,8,26,0.7) 10%, rgba(12,8,26,0.7) 90%, rgba(10,6,22,0) 100%);
+    }
+
+    /* ── CHAPTER HEADING ── */
+    .chapter {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .chapter-number {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .chapter-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--star);
+      line-height: 1.3;
+    }
+
+    .chapter-rule {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0 0;
+    }
+
+    .chapter-rule::before,
+    .chapter-rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+
+    .chapter-rule::after {
+      background: linear-gradient(to left, transparent, var(--gold));
+    }
+
+    .chapter-rule-gem {
+      width: 6px;
+      height: 6px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    /* ── BODY TEXT ── */
+    .body-text p {
+      margin-bottom: 1.6rem;
+      color: #ddd0bb;
+      font-size: 1.08rem;
+    }
+
+    .body-text p:first-child::first-letter {
+      font-family: 'Cinzel', serif;
+      font-size: 3.8rem;
+      float: left;
+      line-height: 0.8;
+      margin: 0.1em 0.12em 0 0;
+      color: var(--gold);
+    }
+
+    /* ── PULL QUOTE ── */
+    .pull-quote {
+      border-left: 2px solid var(--gold);
+      margin: 2.5rem 0 2.5rem 1.5rem;
+      padding: 0.5rem 0 0.5rem 1.8rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      color: var(--gold-light);
+      line-height: 1.6;
+    }
+
+    /* ── PRAYER BLOCK ── */
+    .prayer {
+      background: radial-gradient(ellipse at center, rgba(200,169,110,0.07) 0%, transparent 70%);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 2px;
+      padding: 2.5rem 2rem;
+      margin: 3rem 0;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--gold-light);
+      line-height: 1.9;
+    }
+
+    .prayer::before {
+      content: '✦';
+      display: block;
+      font-style: normal;
+      color: var(--gold);
+      font-size: 1rem;
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.4em;
+    }
+
+    /* ── SCENE TIMESTAMP ── */
+    .timestamp {
+      font-size: 0.78rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--mist);
+      text-align: center;
+      margin: 3rem 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .timestamp::before,
+    .timestamp::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(138,154,176,0.3);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 4rem 2rem 5rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      color: rgba(138,154,176,0.5);
+      text-transform: uppercase;
+    }
+
+    footer .end-mark {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 1rem;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 0.9; }
+    }
+
+    /* ── REVEAL ON SCROLL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── CONSTELLATION DECO ── */
+    .constellation {
+      display: block;
+      margin: 2rem auto;
+      opacity: 0.35;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 600px) {
+      .page { padding: 4rem 1.4rem; }
+      .body-text p:first-child::first-letter { font-size: 3rem; }
+      .pull-quote { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Starfield canvas -->
+<canvas id="stars-canvas"></canvas>
+
+<!-- ═══════════════ COVER ═══════════════ -->
+<section class="cover">
+  <div class="cover-ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+  <h1 class="cover-title">The Dream Girl</h1>
+  <p class="cover-subtitle">A Dream Journal</p>
+  <div class="cover-divider"></div>
+  <p class="cover-date">16th May 2026</p>
+  <p class="scroll-hint">↓ &nbsp; read &nbsp; ↓</p>
+</section>
+
+<!-- ═══════════════ PART I ═══════════════ -->
+<article class="page page-bg">
+
+  <header class="chapter reveal">
+    <span class="chapter-number">Part One</span>
+    <h2 class="chapter-title">The First Vision</h2>
+    <div class="chapter-rule"><div class="chapter-rule-gem"></div></div>
+  </header>
+
+  <div class="body-text reveal">
+    <p>
+      I saw her for the very first time in the quiet theatre of my dreams, somewhere between the 2nd and
+      4th standard — a time when the world still felt vast and unknowable (2012–2014). She appeared like
+      a gentle ray of dawn breaking through the dark, arriving not to haunt but to bless. She came bearing
+      the most precious gift: the promise that I had already triumphed — that somewhere in the future, the
+      exam had been cleared, the battle had been won.
+    </p>
+    <p>
+      And with that promise came another, even more precious: she would be there for me, steadfast as a
+      lighthouse, expecting me until the very last breath of her life. In that dream, the feeling was so real,
+      so vivid, that even waking could not erase it. She followed me like a guardian angel — not in a way
+      that frightened, but in a way that warmed the coldest corners of my heart.
+    </p>
+  </div>
+
+  <div class="pull-quote reveal">
+    "Though her face was always a soft blur, like morning mist over still water, her presence was unmistakable."
+  </div>
+
+  <header class="chapter reveal" style="margin-top:4rem;">
+    <span class="chapter-number">Part Two</span>
+    <h2 class="chapter-title">A Guardian Through the Darkest Hours</h2>
+    <div class="chapter-rule"><div class="chapter-rule-gem"></div></div>
+  </header>
+
+  <div class="body-text reveal">
+    <p>
+      Whenever the world grew heavy on my shoulders — whenever doubt crept in like a thief in the night
+      and I was on the very edge of surrendering — she would come. Just once or twice a year, like a rare
+      and precious comet crossing the sky, she would appear in my dreams and breathe courage back into
+      my weary soul. She was the most beautiful woman I had ever seen: like a fairy princess woven from
+      moonlight and stardust, her skin as soft as silk and as pure as fresh-fallen snow.
+    </p>
+    <p>
+      Her voice, though I cannot recall its exact sound, carried the warmth of a thousand sunsets. She
+      reminded me, again and again, that I could not afford to lose my way — that my destination was worth
+      every stumble, every sleepless night, every silent tear.
+    </p>
+  </div>
+
+  <div class="pull-quote reveal">
+    "She was not merely a dream; she was my compass."
+  </div>
+
+</article>
+
+<!-- ═══════════════ PART III ═══════════════ -->
+<article class="page">
+
+  <div class="timestamp reveal">16th May 2026 &nbsp;·&nbsp; 2:45 PM – 3:31 PM</div>
+
+  <header class="chapter reveal">
+    <span class="chapter-number">Part Three</span>
+    <h2 class="chapter-title">The Reunion Dream</h2>
+    <div class="chapter-rule"><div class="chapter-rule-gem"></div></div>
+  </header>
+
+  <div class="body-text reveal">
+    <p>
+      Then, after years of these fleeting visits, she returned to me in the most glorious dream of all — on
+      the 16th of May, 2026, between 2:45 and 3:31 in the afternoon. And this time, the dream did not
+      end in longing. This time, we had won.
+    </p>
+    <p>
+      There I was, at the High School Reunion of the 2017–2020 batch, walking into that room not as the
+      boy who had once trembled with uncertainty, but as a man who had carved his success with his own
+      hands. My dear friends — Romesh, Arjun, and Amir Hussain — were there too, each glowing with
+      their own triumphs. Even Amir's spectacles had grown thicker with the wisdom of the years, a quiet,
+      endearing reminder of time's gentle passage.
+    </p>
+  </div>
+
+  <header class="chapter reveal" style="margin-top:3.5rem;">
+    <span class="chapter-number">Part Four</span>
+    <h2 class="chapter-title">Her Presence at My Side</h2>
+    <div class="chapter-rule"><div class="chapter-rule-gem"></div></div>
+  </header>
+
+  <div class="body-text reveal">
+    <p>
+      And she was there. She was <em>actually</em> there. She clung to my right arm as though I were the
+      very anchor of her world, and I — lost completely in the warmth of her nearness — would not have
+      let go for anything. While I laughed and caught up with old friends, swapping stories from years gone
+      by, she remained there, a quiet warmth against my arm, her presence more eloquent than any words.
+    </p>
+    <p>
+      When three haughty girls from our class attempted their familiar mockery, she was my shield without
+      even raising her voice — her mere presence silencing the cruelty with a dignity that left no room for
+      unkindness.
+    </p>
+  </div>
+
+  <header class="chapter reveal" style="margin-top:3.5rem;">
+    <span class="chapter-number">Part Five</span>
+    <h2 class="chapter-title">A Dinner Beneath the Stars</h2>
+    <div class="chapter-rule"><div class="chapter-rule-gem"></div></div>
+  </header>
+
+  <!-- Ursa Major constellation SVG -->
+  <svg class="constellation reveal" width="180" height="90" viewBox="0 0 180 90" xmlns="http://www.w3.org/2000/svg">
+    <!-- stars -->
+    <circle cx="30" cy="60" r="2.5" fill="#f0e6c8"/>
+    <circle cx="60" cy="45" r="2"   fill="#f0e6c8"/>
+    <circle cx="90" cy="30" r="2.5" fill="#f0e6c8"/>
+    <circle cx="120" cy="20" r="2"  fill="#f0e6c8"/>
+    <circle cx="145" cy="35" r="2"  fill="#f0e6c8"/>
+    <circle cx="160" cy="55" r="2.5" fill="#f0e6c8"/>
+    <circle cx="140" cy="65" r="2"  fill="#f0e6c8"/>
+    <!-- North Star -->
+    <circle cx="30" cy="10" r="3.5" fill="#c8a96e"/>
+    <text x="36" y="14" font-family="EB Garamond,serif" font-size="9" fill="#c8a96e" opacity="0.7">North Star</text>
+    <!-- pointer line -->
+    <line x1="90" y1="30" x2="30" y2="10" stroke="#c8a96e" stroke-width="0.6" stroke-dasharray="3 3" opacity="0.5"/>
+    <line x1="120" y1="20" x2="30" y2="10" stroke="#c8a96e" stroke-width="0.6" stroke-dasharray="3 3" opacity="0.5"/>
+    <!-- bowl lines -->
+    <line x1="30"  y1="60" x2="60"  y2="45" stroke="#f0e6c8" stroke-width="0.8" opacity="0.4"/>
+    <line x1="60"  y1="45" x2="90"  y2="30" stroke="#f0e6c8" stroke-width="0.8" opacity="0.4"/>
+    <line x1="90"  y1="30" x2="120" y2="20" stroke="#f0e6c8" stroke-width="0.8" opacity="0.4"/>
+    <line x1="120" y1="20" x2="145" y2="35" stroke="#f0e6c8" stroke-width="0.8" opacity="0.4"/>
+    <line x1="145" y1="35" x2="160" y2="55" stroke="#f0e6c8" stroke-width="0.8" opacity="0.4"/>
+    <line x1="160" y1="55" x2="140" y2="65" stroke="#f0e6c8" stroke-width="0.8" opacity="0.4"/>
+    <line x1="140" y1="65" x2="120" y2="20" stroke="#f0e6c8" stroke-width="0.8" opacity="0.4"/>
+  </svg>
+
+  <div class="body-text reveal">
+    <p>
+      At dinner, I found myself telling her how to find True North using the Great Bear constellation —
+      how to trace the line from the two pointer stars of Ursa Major to the steadfast North Star, faithful
+      and unmoving in its place in the heavens. She listened with those beautiful eyes — those impossibly
+      beautiful eyes — drinking in every word not merely as knowledge, but as poetry.
+    </p>
+    <p>
+      Her gaze was full of a love so pure it made the stars themselves feel close. We shared quiet smiles at
+      the knowing giggles of our friends, and then we slipped away to the room that felt like the entire
+      universe, just the two of us, where time stopped, and the world outside ceased to matter entirely.
+    </p>
+  </div>
+
+  <!-- Prayer -->
+  <div class="prayer reveal">
+    <p>
+      She is tall, graceful, and luminous — a figure that seems to belong both to dreams<br/>
+      and to the very best version of waking life. Her eyes hold entire galaxies.<br/>
+      Her smile could end a thousand sleepless nights.
+    </p>
+    <br/>
+    <p>
+      Please, God — do not take this memory from me.<br/>
+      Let me carry it for the rest of my days, as a lantern in the dark.<br/>
+      She is my dream, my direction, my North Star.
+    </p>
+    <br/>
+    <p>
+      I do not know when she will arrive in my waking life,<br/>
+      but I know this with every fibre of my being:<br/>
+      when she does, I will make her my life.<br/>
+      I will make her my everything.
+    </p>
+    <br/>
+    <p>
+      And until that blessed day, I ask for just one mercy —<br/>
+      let me see her every night when I close my eyes.<br/>
+      Let every dream I dream be filled with her presence,<br/>
+      for even in sleep, she is my greatest joy,<br/>
+      my most beautiful reason to shut the world away<br/>
+      and surrender peacefully to the night.
+    </p>
+  </div>
+
+</article>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <span class="end-mark">✦</span>
+  <span>A Dream Journal &nbsp;·&nbsp; 16th May 2026 &nbsp;·&nbsp; Written from the heart</span>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+  /* ── STARFIELD ── */
+  (function() {
+    const canvas = document.getElementById('stars-canvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initStars() {
+      stars = [];
+      const n = Math.floor((canvas.width * canvas.height) / 4000);
+      for (let i = 0; i < n; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.4 + 0.2,
+          a: Math.random(),
+          speed: Math.random() * 0.004 + 0.001,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function draw(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const s of stars) {
+        const alpha = s.a * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(240,230,200,${alpha})`;
+        ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => { resize(); initStars(); });
+    resize();
+    initStars();
+    requestAnimationFrame(draw);
+  })();
+
+  /* ── SCROLL REVEAL ── */
+  (function() {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  })();
+</script>
+
+</body>
+</html>
